@@ -1,12 +1,12 @@
-import * as THREE from 'three';
+import * as Three from 'three';
 
-const { Box3, Vector3 } = THREE;
+const { Box3, Vector3 } = Three;
 
 /**
  * 获取模型的中心点和尺寸
  * @param model 
  */
-export function getModelCenterAndSize(model: THREE.Object3D) {
+export function getModelCenterAndSize(model: Three.Object3D) {
   const box = new Box3().setFromObject(model);
   const center = new Vector3();
   const size = new Vector3();
@@ -25,7 +25,7 @@ export function getModelCenterAndSize(model: THREE.Object3D) {
  * 设置模型位置居中
  * @param model 
  */
-export function setModelInCenter(model: THREE.Object3D) {
+export function setModelInCenter(model: Three.Object3D) {
   const { center } = getModelCenterAndSize(model);
   model.position.x = model.position.x - center.x;
   model.position.y = model.position.y - center.y;
