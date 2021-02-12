@@ -6,20 +6,24 @@ import _get from 'lodash/get';
 
 const { useRef, useEffect } = React;
 
-interface SingleModelSceneProps {
+
+const defaultProps = {
+  fov: 0.75,
+  height: 500,
+  width: 500,
+  near: 0.1,
+  far: 1000,
+  lights: createDefaultLights(),
+}
+
+type SingleModelSceneProps = {
   model?: Three.Object3D;
   autoRotate?: boolean;
   rotateSpeed?: number;
-  modelRotation: Xyz;
+  modelRotation?: Xyz;
   disableControl?: boolean;
-  fov: number;
-  height: number;
-  width: number;
-  near: number;
-  far: number;
-  lights?: Three.Light[];
   style?: React.CSSProperties;
-}
+} & Partial<typeof defaultProps>
 
 
 export default function SingleModelScene(props: SingleModelSceneProps) {
@@ -27,7 +31,7 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
     fov, height, width, near, far, style,
     autoRotate, disableControl,
     model, lights,
-  } = props;
+  } = Object.assign({}, props, defaultProps);
 
   const id = useRef('model-scene' + _uniqueId());
   const umount = useRef(false);
@@ -107,14 +111,8 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
   )
 }
 
-SingleModelScene.defaultProps = {
-  fov: 0.75,
-  height: 500,
-  width: 500,
-  near: 0.1,
-  far: 1000,
-  lights: createDefaultLights(),
-}
+SingleModelScene.defaultProps = defaultProps;
+
 
 function createDefaultLights() {
   const hemiLight = new Three.HemisphereLight(0xffffff, 0x444444);
