@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Three from 'three';
 import { createPerspectiveCamera, createOrbitControls } from '../../common/helper3d';
+import BaseScene from './baseScene';
 import _uniqueId from 'lodash/uniqueId';
 import _get from 'lodash/get';
 
@@ -31,13 +32,16 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
     fov, height, width, near, far, style,
     autoRotate, disableControl,
     model, lights,
-  } = Object.assign({}, props, defaultProps);
-
-  const id = useRef('model-scene' + _uniqueId());
-  const umount = useRef(false);
+  } = props;
 
   const scene = useRef(new Three.Scene());
-  const camera = useRef(createPerspectiveCamera(scene.current, fov, width / height, near, far))
+  const camera = useRef(createPerspectiveCamera(
+    scene.current,
+    fov as number,
+    (width as number) / (height as number),
+    near as number,
+    far as number,
+  ))
   // const mixer = useRef<Three.AnimationMixer>();
   const renderer = useRef(new Three.WebGLRenderer({ antialias: true, alpha: true }));
   const cameraControl = useRef(createOrbitControls(camera.current, renderer.current));
@@ -64,31 +68,6 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
     camera.current.updateProjectionMatrix();
   }
 
-  const startAnimate = () => {
-    if (umount.current) return;
-
-    cameraControl.current.update();
-    renderer.current.render(scene.current, camera.current);
-
-    requestAnimationFrame(startAnimate);
-  }
-
-  const renderScene = () => {
-    const $el = document.getElementById(id.current) as HTMLElement;
-
-    renderer.current.setPixelRatio(window.devicePixelRatio);
-    renderer.current.setSize($el.offsetWidth, $el.offsetHeight);
-    $el.appendChild(renderer.current.domElement);
-  }
-
-  useEffect(() => {
-    renderScene();
-    startAnimate();
-    return () => {
-      umount.current = true;
-    }
-  }, []);
-
   useEffect(() => {
     addModel();
   }, [model]);
@@ -107,7 +86,13 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
   }, [height, width]);
 
   return (
-    <div id={id.current} style={{ height, width, ...style }} />
+    <BaseScene
+      style={{ height, width, ...style }}
+      camera={camera.current}
+      scene={scene.current}
+      renderer={renderer.current}
+      cameraControl={cameraControl.current}
+    />
   )
 }
 
