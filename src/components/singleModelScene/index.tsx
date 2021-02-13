@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Three from 'three';
-import { createPerspectiveCamera, createOrbitControls, fitCameraShowAllModel } from '../../common/helper3d';
+import { createPerspectiveCamera, createOrbitControls, setModelInCenter, fitCameraShowAllModel } from '../../common/helper3d';
 import BaseScene from './baseScene';
 import _uniqueId from 'lodash/uniqueId';
 import _get from 'lodash/get';
@@ -15,6 +15,7 @@ const defaultProps = {
   near: 0.1,
   far: 1000,
   lights: createDefaultLights(),
+  modelScale: 1,
 }
 
 export type SingleModelSceneProps = {
@@ -37,7 +38,7 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
   const {
     fov, height, width, near, far, style,
     autoRotate, disableControl, rotateSpeed,
-    model, lights,
+    model, lights, modelScale, modelRotation,
   } = props;
 
   const scene = useRef(new Three.Scene());
@@ -58,7 +59,16 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
     cameraControl.current.autoRotateSpeed = _get(props, 'rotateSpeed', 12) / 6;
   }
 
-  const addModel = () => {
+  const scaleModel = (model?: Three.Object3D) => {
+    modelScale && model?.scale.set(modelScale, modelScale, modelScale)
+  }
+
+  const rotateModel = (model?: Three.Object3D) => {
+    const { x = 0, y = 0, z = 0 } = modelRotation || {};
+    model?.rotation.set(x, y, z);
+  }
+
+  const addModelToScene = () => {
     if (!model) return;
     if (scene.current.getObjectById(model.id)) {
       scene.current.remove(model);
@@ -74,10 +84,17 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
     camera.current.updateProjectionMatrix();
   }
 
+  const initModel = () => {
+    addModelToScene();
+    model && fitCameraShowAllModel(model, camera.current);
+    scaleModel(model);
+    rotateModel(model);
+    setModelInCenter(model);
+  }
+
   useEffect(() => {
-    addModel();
-    model && fitCameraShowAllModel(model, camera.current)
-  }, [model]);
+    initModel();
+  }, [model, modelScale, modelRotation]);
 
   useEffect(() => {
     lights?.forEach(light => {

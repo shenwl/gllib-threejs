@@ -11,8 +11,10 @@ export default () => (
   <ModelContainer 
     modelUrl="http://127.0.0.1:8080/RobotExpressive.glb" 
     style={{background: 'antiquewhite'}}
-    autoRotate={true}
+    autoRotate={false}
+    modelRotation={{y: -50}}
     rotateSpeed={100}
+    modelScale={2}
   />
 );
 ```
