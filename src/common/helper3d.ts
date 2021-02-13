@@ -59,8 +59,9 @@ export function createPerspectiveCamera(scene: Three.Scene, fov: number, aspect:
  * @param model 
  * @param material 
  */
-export function setMaterial(model: Object3D, material: Three.Material) {
-  model.traverse(child => {
+export function setMaterial(model?: Object3D, material?: Three.Material) {
+  if (!material) return;
+  model?.traverse(child => {
     if (child instanceof Three.Mesh) {
       child.material = material;
     }

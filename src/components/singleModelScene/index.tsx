@@ -17,7 +17,7 @@ const defaultProps = {
   lights: createDefaultLights(),
 }
 
-type SingleModelSceneProps = {
+export type SingleModelSceneProps = {
   model?: Three.Object3D;
   autoRotate?: boolean;
   rotateSpeed?: number;
@@ -26,11 +26,16 @@ type SingleModelSceneProps = {
   style?: React.CSSProperties;
 } & Partial<typeof defaultProps>
 
-
+/**
+ * 单模型场景
+ * 1. 可调整画布（大小，背景），相机（fov, near, far）
+ * 2. 支持相机控制器的启用、旋转、调整转速速度
+ * 3. 支持传入自定义光源组合
+ */
 export default function SingleModelScene(props: SingleModelSceneProps) {
   const {
     fov, height, width, near, far, style,
-    autoRotate, disableControl,
+    autoRotate, disableControl, rotateSpeed,
     model, lights,
   } = props;
 
@@ -84,6 +89,10 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
   useEffect(() => {
     updateSize();
   }, [height, width]);
+
+  useEffect(() => {
+    updateControl();
+  }, [disableControl, autoRotate, rotateSpeed]);
 
   return (
     <BaseScene

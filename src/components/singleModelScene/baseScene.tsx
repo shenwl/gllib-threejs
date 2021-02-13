@@ -11,6 +11,10 @@ type SceneProps = {
   cameraControl?: OrbitControls;
 }
 
+/**
+ * 基础场景
+ * 负责Scene dom的创建，动画的播放，刷新
+ */
 export default class BaseScene extends React.Component<SceneProps> {
   id = _uniqueId('model-scene');
   umount = false;

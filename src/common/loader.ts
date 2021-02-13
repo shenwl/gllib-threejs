@@ -11,7 +11,7 @@ const logger = new Logger({ prefix: '[model loader]' });
 
 interface LoaderOptions {
   mtlUrl?: string;
-  resourcePath: string;
+  resourcePath?: string;
 }
 
 const setLoadersCors = (loaders: any[]) => {
