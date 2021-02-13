@@ -33,6 +33,7 @@ export default class BaseScene extends React.Component<SceneProps> {
     const { cameraControl, renderer, scene, camera } = this.props;
 
     cameraControl?.update();
+
     renderer.render(scene, camera);
 
     requestAnimationFrame(this.animate);

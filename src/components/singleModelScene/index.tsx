@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Three from 'three';
-import { createPerspectiveCamera, createOrbitControls } from '../../common/helper3d';
+import { createPerspectiveCamera, createOrbitControls, fitCameraShowAllModel } from '../../common/helper3d';
 import BaseScene from './baseScene';
 import _uniqueId from 'lodash/uniqueId';
 import _get from 'lodash/get';
@@ -9,7 +9,7 @@ const { useRef, useEffect } = React;
 
 
 const defaultProps = {
-  fov: 0.75,
+  fov: 75,
   height: 500,
   width: 500,
   near: 0.1,
@@ -31,6 +31,7 @@ export type SingleModelSceneProps = {
  * 1. 可调整画布（大小，背景），相机（fov, near, far）
  * 2. 支持相机控制器的启用、旋转、调整转速速度
  * 3. 支持传入自定义光源组合
+ * 4. 模型自适应剧中，相机位置自动调节展示完整模型（2倍模型高俯视）
  */
 export default function SingleModelScene(props: SingleModelSceneProps) {
   const {
@@ -46,7 +47,7 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
     (width as number) / (height as number),
     near as number,
     far as number,
-  ))
+  ));
   // const mixer = useRef<Three.AnimationMixer>();
   const renderer = useRef(new Three.WebGLRenderer({ antialias: true, alpha: true }));
   const cameraControl = useRef(createOrbitControls(camera.current, renderer.current));
@@ -75,15 +76,15 @@ export default function SingleModelScene(props: SingleModelSceneProps) {
 
   useEffect(() => {
     addModel();
+    model && fitCameraShowAllModel(model, camera.current)
   }, [model]);
 
   useEffect(() => {
-    (lights || []).forEach(light => {
-      if (scene.current.getObjectById(light.id)) {
-        return;
+    lights?.forEach(light => {
+      if (!scene.current.getObjectById(light.id)) {
+        scene.current.add(light);
       }
-      scene.current.add(light);
-    })
+    });
   }, [lights]);
 
   useEffect(() => {

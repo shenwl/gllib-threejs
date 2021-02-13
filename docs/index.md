@@ -1,2 +1,2 @@
 
-## Hello gllib-threejs!
+## gllib-threejs!

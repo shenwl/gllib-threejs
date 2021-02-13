@@ -41,11 +41,28 @@ export function getModelCenterAndSize(model: Three.Object3D) {
  * 设置模型位置居中
  * @param model 
  */
-export function setModelInCenter(model: Three.Object3D) {
+export function setModelInCenter(model?: Three.Object3D) {
+  if (!model) return;
   const { center } = getModelCenterAndSize(model);
   model.position.x = model.position.x - center.x;
   model.position.y = model.position.y - center.y;
-  model.position.y = model.position.y - center.y;
+  model.position.z = model.position.z - center.z;
+}
+
+export function fitCameraShowAllModel(
+  model: Object3D, camera: Three.Camera, 
+  fov: number = 75, cameraHight = 1.5,
+  ) {
+  const { size } = getModelCenterAndSize(model);
+  const dist = size.y / (2 * Math.tan(Math.PI * fov / 360));
+  const pos = model.position;
+
+  const cameraX = pos.x + size.x * 1.5;
+  const cameraY = pos.y + size.y * cameraHight;
+  const cameraZ = dist + size.z;
+
+  camera.position.set(cameraX, cameraY, cameraZ);
+  camera.lookAt(pos);
 }
 
 export function createPerspectiveCamera(scene: Three.Scene, fov: number, aspect: number, near: number, far: number) {

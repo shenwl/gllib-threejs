@@ -2,8 +2,7 @@ import * as React from 'react';
 import * as Three from 'three';
 import SingleModelScene, { SingleModelSceneProps } from '../singleModelScene';
 import { loadModel } from '../../common/loader';
-import { setMaterial } from '../../common/helper3d';
-import { Object3D } from 'three';
+import { setMaterial, setModelInCenter } from '../../common/helper3d';
 
 const { useState, useEffect } = React;
 
@@ -28,12 +27,13 @@ export default function ModelContainer(props: ModelContainerProps) {
   const getModel = async () => {
     const modelObj = await loadModel(modelUrl, { resourcePath });
     setMaterial(modelObj, material);
+    setModelInCenter(modelObj);
     setModel(modelObj);
   }
 
   useEffect(() => {
     getModel();
-  }, [model]);
+  }, [modelUrl]);
 
   useEffect(() => {
     setMaterial(model, material);

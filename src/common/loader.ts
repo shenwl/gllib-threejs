@@ -75,6 +75,7 @@ export function loadModel(url: string, opts?: LoaderOptions) {
   const fn = loaderByFileType[type];
   if (!fn) {
     logger.error('invalid file type: ' + type);
+    return;
   }
   return fn(url, opts);
 }
