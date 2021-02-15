@@ -3,14 +3,16 @@ import * as Three from 'three';
 import SingleModelScene, { SingleModelSceneProps } from '../singleModelScene';
 import { loadModel } from '../../common/loader';
 import { setMaterial } from '../../common/helper3d';
-import { Object3D } from 'three';
+import { Object3D, Mesh, Material } from 'three';
 
 const { useState, useEffect } = React;
 
 interface ModelContainerProps extends SingleModelSceneProps {
   modelUrl: string;
   resourcePath?: string;
-  material?: Three.Material;
+  material?: Material;
+  onLoad?: (model?: Object3D, meshes?: Mesh[]) => void;
+  materials?: { [MeshUuid: string]: Material };
 }
 
 /**
@@ -21,14 +23,29 @@ interface ModelContainerProps extends SingleModelSceneProps {
  * 4. 支持模型xyz轴旋转
  */
 export default function ModelContainer(props: ModelContainerProps) {
-  const { modelUrl, resourcePath, material, ...restProps } = props;
+  const { modelUrl, resourcePath, material, onLoad, ...restProps } = props;
 
   const [model, setModel] = useState<Object3D>();
+  const [meshes, setMeshes] = useState<Three.Mesh[]>();
+
+  const getMeshs = (modelObj?: Object3D) => {
+    const meshes: Mesh[] = [];
+    modelObj?.traverse(child => {
+      if (child instanceof Mesh) {
+        meshes.push(child);
+      }
+    });
+    setMeshes(meshes);
+    return meshes;
+  }
 
   const getModel = async () => {
     const modelObj = await loadModel(modelUrl, { resourcePath });
+    const meshes = getMeshs(modelObj);
     setMaterial(modelObj, material);
     setModel(modelObj);
+
+    onLoad && onLoad(modelObj, meshes);
   }
 
   useEffect(() => {
