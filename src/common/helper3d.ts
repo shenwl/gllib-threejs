@@ -1,5 +1,5 @@
 import * as Three from 'three';
-import { Object3D } from 'three';
+import { Object3D, Mesh, Material } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 
@@ -81,6 +81,16 @@ export function setMaterial(model?: Object3D, material?: Three.Material) {
   model?.traverse(child => {
     if (child instanceof Three.Mesh) {
       child.material = material;
+    }
+  })
+}
+
+export function setMeshesMaterial(meshes?: Mesh[], materials?: { [MeshUuid: string]: Material }) {
+  if (!meshes || !materials) return;
+  meshes.forEach(mesh => {
+    const material = materials[mesh?.uuid];
+    if (material) {
+      mesh.material = material;
     }
   })
 }

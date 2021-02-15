@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Three from 'three';
 import SingleModelScene, { SingleModelSceneProps } from '../singleModelScene';
 import { loadModel } from '../../common/loader';
-import { setMaterial } from '../../common/helper3d';
+import { setMaterial, setMeshesMaterial } from '../../common/helper3d';
 import { Object3D, Mesh, Material } from 'three';
 
 const { useState, useEffect } = React;
@@ -23,7 +23,7 @@ interface ModelContainerProps extends SingleModelSceneProps {
  * 4. 支持模型xyz轴旋转
  */
 export default function ModelContainer(props: ModelContainerProps) {
-  const { modelUrl, resourcePath, material, onLoad, ...restProps } = props;
+  const { modelUrl, resourcePath, material, materials, onLoad, ...restProps } = props;
 
   const [model, setModel] = useState<Object3D>();
   const [meshes, setMeshes] = useState<Three.Mesh[]>();
@@ -42,9 +42,11 @@ export default function ModelContainer(props: ModelContainerProps) {
   const getModel = async () => {
     const modelObj = await loadModel(modelUrl, { resourcePath });
     const meshes = getMeshs(modelObj);
-    setMaterial(modelObj, material);
-    setModel(modelObj);
 
+    setMaterial(modelObj, material);
+    setMeshesMaterial(meshes, materials);
+    
+    setModel(modelObj);
     onLoad && onLoad(modelObj, meshes);
   }
 
@@ -57,9 +59,8 @@ export default function ModelContainer(props: ModelContainerProps) {
   }, [material]);
 
   useEffect(() => {
-    setMaterial(model, material);
-  }, [material]);
-
+    setMeshesMaterial(meshes, materials);
+  }, [materials]);
 
   return (
     <SingleModelScene {...restProps} model={model} />
